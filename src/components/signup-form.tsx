@@ -13,8 +13,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { signupAction } from '@/app/actions/auth-actions';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -40,30 +40,40 @@ export function SignupForm() {
     },
   });
 
+  const { setUser } = useAuth();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      
-      if (userCredential.user) {
-        await updateProfile(userCredential.user, {
-          displayName: values.name,
+      const result = await signupAction({
+        email: values.email,
+        password: values.password,
+        displayName: values.name
+      });
+
+      if (result.success && result.user) {
+        setUser({
+          id: result.user.id,
+          email: result.user.email,
+          displayName: result.user.displayName
+        });
+        toast({
+          title: 'Conta criada com sucesso!',
+          description: 'A redirecionar para o seu painel.',
+        });
+        router.push('/dashboard');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao criar conta',
+          description: result.error || 'Ocorreu um erro ao criar sua conta.',
         });
       }
-
-      toast({
-        title: 'Conta criada com sucesso!',
-        description: 'A redirecionar para o seu painel.',
-      });
-      router.push('/dashboard');
-
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Erro ao criar conta',
-        description: error.code === 'auth/email-already-in-use' 
-          ? 'Este email já está em uso.' 
-          : 'Ocorreu um erro. Por favor, tente novamente.',
+        description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
       });
       console.error(error);
     } finally {

@@ -1,19 +1,19 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import type { User } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { getSessionToken } from '@/app/actions/auth-actions';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  setUser: () => { },
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -21,15 +21,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser as User | null);
-      setLoading(false);
-    });
+    // Verificar sessão inicialmente
+    async function checkSession() {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    return () => unsubscribe();
+    checkSession();
   }, []);
 
-  const value = { user, loading };
+  const value = { user, loading, setUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

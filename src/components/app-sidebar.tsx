@@ -5,7 +5,8 @@ import {
   Home,
   Settings,
   Users2,
-  FileText
+  FileText,
+  BarChart3
 } from 'lucide-react';
 
 import {
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Painel' },
   { href: '/dashboard/budgets', icon: FileText, label: 'Orçamentos' },
+  { href: '/dashboard/quotations', icon: BarChart3, label: 'Cotações' },
   { href: '/dashboard/clients', icon: Users2, label: 'Clientes' },
 ];
 

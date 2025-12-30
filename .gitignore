@@ -43,3 +43,12 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.log
+
+# sqlite database
+/data/*.sqlite
+/data/*.sqlite-shm
+/data/*.sqlite-wal
+
+# uploads
+/public/uploads/*
+!/public/uploads/.gitkeep

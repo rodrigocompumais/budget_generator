@@ -13,8 +13,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { loginAction } from '@/app/actions/auth-actions';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -38,20 +38,36 @@ export function LoginForm() {
     },
   });
 
+  const { setUser } = useAuth();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      toast({
-        title: 'Login bem-sucedido!',
-        description: 'A redirecionar para o seu painel.',
-      });
-      router.push('/dashboard');
+      const result = await loginAction(values);
+
+      if (result.success && result.user) {
+        setUser({
+          id: result.user.id,
+          email: result.user.email,
+          displayName: result.user.displayName
+        });
+        toast({
+          title: 'Login bem-sucedido!',
+          description: 'A redirecionar para o seu painel.',
+        });
+        router.push('/dashboard');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Erro no login',
+          description: result.error || 'As credenciais estão incorretas. Por favor, tente novamente.',
+        });
+      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Erro no login',
-        description: 'As credenciais estão incorretas. Por favor, tente novamente.',
+        description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
       });
       console.error(error);
     } finally {
