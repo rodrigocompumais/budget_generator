@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getQuotationSummary } from '@/lib/quotation-service';
 import { getUserFromToken } from '@/lib/auth-service';
-import { getSessionToken } from '../../actions/auth-actions';
+import { getSessionToken } from '../../../actions/auth-actions';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

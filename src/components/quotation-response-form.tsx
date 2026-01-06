@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CheckCircle2, Send, Loader2, Building2, User, Info } from 'lucide-react';
 import { saveQuotationResponseAction } from '@/app/actions/quotation-actions';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
 interface QuotationResponseFormProps {

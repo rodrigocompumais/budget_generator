@@ -149,8 +149,7 @@ export async function saveQuotationResponse(data: Omit<QuotationResponse, 'id' |
  * Obter resumo da cotação com comparação de preços
  */
 export async function getQuotationSummary(quotationId: string, userId: string) {
-    // Verificar se a cotação pertence ao usuário
-    const q = db.prepare(`SELECT title FROM quotations WHERE id = ? AND user_id = ?`).get(quotationId, userId);
+    const q = db.prepare(`SELECT title FROM quotations WHERE id = ? AND user_id = ?`).get(quotationId, userId) as { title: string } | undefined;
     if (!q) return null;
 
     const items = db.prepare(`SELECT * FROM quotation_items WHERE quotation_id = ?`).all(quotationId) as any[];
